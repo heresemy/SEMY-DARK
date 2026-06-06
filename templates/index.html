@@ -1,0 +1,442 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>NumApis Checker | SEMY</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0f1e 0%, #0c1222 50%, #0a0e1a 100%);
+            font-family: 'Share Tech Mono', 'Courier New', 'Fira Code', monospace;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Matrix-like background effect */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(rgba(0, 255, 0, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Glitch effect on main container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header Section - Hacking Style */
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(10, 20, 30, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .developer-name {
+            font-size: 2.8rem;
+            font-weight: bold;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, #00ff88, #00ccff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 5px rgba(0, 255, 136, 0.3); }
+            to { text-shadow: 0 0 20px rgba(0, 255, 136, 0.6); }
+        }
+
+        .city-name {
+            font-size: 1.1rem;
+            color: #88ffaa;
+            margin-top: 8px;
+            letter-spacing: 2px;
+            opacity: 0.8;
+        }
+
+        .city-name::before {
+            content: "📍 ";
+            color: #ff6666;
+        }
+
+        /* Terminal style search box */
+        .search-card {
+            background: rgba(5, 10, 20, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 255, 0, 0.4);
+            padding: 30px 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .terminal-prompt {
+            color: #00ff88;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            font-family: monospace;
+        }
+
+        .terminal-prompt::before {
+            content: "$> ";
+            color: #ffaa44;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .number-input {
+            flex: 1;
+            background: #0a0f1e;
+            border: 2px solid #1a2a3a;
+            border-radius: 12px;
+            padding: 14px 20px;
+            font-size: 1.1rem;
+            font-family: 'Share Tech Mono', monospace;
+            color: #00ffaa;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .number-input:focus {
+            border-color: #00ff88;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .number-input::placeholder {
+            color: #3a4a5a;
+            font-family: monospace;
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #00aa55, #008844);
+            border: none;
+            border-radius: 12px;
+            padding: 14px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            font-family: monospace;
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+            background: linear-gradient(135deg, #00cc66, #00aa55);
+        }
+
+        /* Results Section */
+        .result-card {
+            background: rgba(5, 10, 20, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid rgba(0, 255, 0, 0.4);
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .success-header {
+            color: #00ff88;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .not-found-header {
+            color: #ffaa44;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .error-header {
+            color: #ff5555;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .record-count {
+            background: #0a1a1a;
+            padding: 8px 15px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            color: #00ffaa;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .record-item {
+            background: rgba(15, 25, 35, 0.6);
+            border-left: 4px solid #00ff88;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .record-item:hover {
+            background: rgba(20, 35, 45, 0.8);
+            transform: translateX(5px);
+        }
+
+        .record-title {
+            color: #ffcc44;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .detail-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .detail-label {
+            width: 130px;
+            color: #88aaff;
+            font-weight: bold;
+        }
+
+        .detail-value {
+            flex: 1;
+            color: #ccddff;
+            word-break: break-word;
+        }
+
+        .badge {
+            background: #1a2a3a;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            color: #88ffaa;
+        }
+
+        .search-again-btn {
+            background: transparent;
+            border: 2px solid #00ff88;
+            border-radius: 30px;
+            padding: 10px 25px;
+            font-family: monospace;
+            color: #00ff88;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .search-again-btn:hover {
+            background: #00ff8822;
+            transform: scale(1.02);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #3a5a6a;
+            font-size: 0.8rem;
+        }
+
+        /* Glitch text effect */
+        .glitch-text {
+            position: relative;
+            animation: glitch 3s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% { text-shadow: none; }
+            95% { text-shadow: none; }
+            96% { text-shadow: -2px 0 #ff00ff, 2px 0 #00ffff; }
+            97% { text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff; }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .developer-name { font-size: 2rem; }
+            .input-group { flex-direction: column; }
+            .detail-label { width: 100px; font-size: 0.8rem; }
+            .detail-value { font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header with Developer Info -->
+        <div class="header">
+            <div class="developer-name glitch-text">SEMY</div>
+            <div class="city-name">PICHHORE</div>
+            <div style="font-size: 0.7rem; color: #44aa77; margin-top: 8px;">// NUMAPIS DATA EXTRACTOR //</div>
+        </div>
+
+        <!-- Search Form -->
+        <div class="search-card">
+            <div class="terminal-prompt">enter mobile number to trace</div>
+            <form method="POST" action="/search" id="searchForm">
+                <div class="input-group">
+                    <input type="tel" name="number" class="number-input" placeholder="+91 7354110439" maxlength="10" pattern="[0-9]{10}" required>
+                    <button type="submit" class="search-btn">SEARCH 🔍</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Error Display -->
+        {% if error %}
+        <div class="result-card">
+            <div class="error-header">
+                <span>🥴</span> ERROR FOUND
+            </div>
+            <div style="color: #ff8888; padding: 10px 0;">
+                {{ error }}
+            </div>
+            <div style="margin-top: 20px; color: #ffaa66; font-size: 0.85rem;">
+                ⚠️ Please try after some time
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Results Display -->
+        {% if result %}
+            {% if result.status == "found" %}
+                <div class="result-card">
+                    <div class="success-header">
+                        <span>✅</span> DATA FOUND SUCCESSFULLY
+                    </div>
+                    <div class="record-count">
+                        📁 RECORDS FOUND : {{ result.count }}
+                    </div>
+                    <div style="margin-bottom: 15px; font-size: 0.8rem; color: #88aacc;">
+                        <span>🔢 Queried: {{ result.queried_number }}</span>
+                        <span style="margin-left: 15px;">🕒 {{ result.timestamp }}</span>
+                    </div>
+
+                    <!-- Display each record -->
+                    {% for record in result.records %}
+                    <div class="record-item">
+                        <div class="record-title">
+                            RECORD {{ loop.index }}
+                            <span class="badge">{{ record.circle | default('UNKNOWN') }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">👤 NAME:</div>
+                            <div class="detail-value">{{ record.name | default('N/A') }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">👪 FATHER:</div>
+                            <div class="detail-value">{{ record.father_name | default('N/A') }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">📱 MOBILE:</div>
+                            <div class="detail-value">{{ record.mobile | default('N/A') }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">🔄 ALT NUMBER:</div>
+                            <div class="detail-value">{{ record.alternate_number | default('N/A') }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">🆔 AADHAAR:</div>
+                            <div class="detail-value">{{ record.aadhaar | default('N/A') }}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">📍 ADDRESS:</div>
+                            <div class="detail-value">{{ record.address | replace('!', ', ') | default('N/A') }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <button class="search-again-btn" onclick="document.getElementById('searchForm').reset(); window.scrollTo({top: 0, behavior: 'smooth'});">
+                        🔄 SEARCH OTHER NUMBER
+                    </button>
+                </div>
+
+            {% elif result.status == "not_found" %}
+                <div class="result-card">
+                    <div class="not-found-header">
+                        <span>🔍</span> NO DATA FOUND
+                    </div>
+                    <div style="color: #ffaa66; padding: 15px 0;">
+                        ⚠️ {{ result.message | default('No records associated with this number') }}
+                    </div>
+                    <div style="color: #6688aa; font-size: 0.85rem;">
+                        🔢 Number: {{ result.queried_number }}
+                    </div>
+                    <button class="search-again-btn" onclick="document.getElementById('searchForm').reset(); window.scrollTo({top: 0, behavior: 'smooth'});">
+                        🔍 SEARCH AGAIN
+                    </button>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <div class="footer">
+            ⚡ NUMAPIS ENGINE v1.0 | SECURE QUERY SYSTEM ⚡
+        </div>
+    </div>
+
+    <script>
+        // Auto-focus on input when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputField = document.querySelector('.number-input');
+            if(inputField) inputField.focus();
+        });
+
+        // Form submission loading effect
+        const form = document.getElementById('searchForm');
+        if(form) {
+            form.addEventListener('submit', function() {
+                const btn = document.querySelector('.search-btn');
+                btn.innerHTML = 'SEARCHING ⏳';
+                btn.disabled = true;
+            });
+        }
+    </script>
+</body>
+</html>
