@@ -29,15 +29,34 @@ async def index(request: Request):
 @app.post("/search", response_class=HTMLResponse)
 async def search_number(
     request: Request,
-    number: str = Form(...)
+    number: str = Form(...),
+    pin: str = Form(...)
 ):
-    """Search for a mobile number and return results"""
+    """Search for a mobile number with PIN and return results"""
     error = None
     result = None
     
-    # Validate number (basic validation)
-    if not number or not number.isdigit() or len(number) < 10:
+    # Validate number
+    if not number or not number.isdigit() or len(number) != 10:
         error = "Invalid mobile number! Please enter a valid 10-digit number."
+        return templates.TemplateResponse(
+            "index.html",
+            {"request": request, "result": None, "error": error}
+        )
+    
+    # Validate PIN
+    if not pin or not pin.isdigit() or len(pin) != 4:
+        error = "Invalid PIN! Please enter a valid 4-digit PIN."
+        return templates.TemplateResponse(
+            "index.html",
+            {"request": request, "result": None, "error": error}
+        )
+    
+    # Check if PIN matches (hardcoded for now - you can change this)
+    VALID_PIN = "8815"  # The PIN you mentioned
+    
+    if pin != VALID_PIN:
+        error = "Invalid PIN! Access denied."
         return templates.TemplateResponse(
             "index.html",
             {"request": request, "result": None, "error": error}
